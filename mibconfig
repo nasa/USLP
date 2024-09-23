@@ -1,0 +1,311 @@
+#
+# if a mcid has any OTHER spacecraft id then all its frames will carry a source/destination bit set to 1 (destination) since it's obviously not from MY spacecraft
+# must be first parameter
+#
+MY_SPACECRAFT_ID 42
+#
+# 
+# packet transfer map stuff  - MUST BE BEFORE MAP STUFF  - matches 4/26/2016 spec
+# 
+PACKET_Valid_Packet_Version_Numbers 0,1,2,3,4,5,6,7
+PACKET_Maximum_Packet_Length        65536
+PACKET_Require_Incomplete_Packet_Delivery_To_User_At_Receiving_End true
+#
+# this is the parameter that tells whether to deliver partial mapas to user. global value, since packet flags were also global values
+MAPA_Require_Incomplete_MAPA_Delivery_To_User_At_Receiving_End true
+#
+#physical channel - matches 4/26/2016 spec
+#
+#PHYSICAL_CHANNEL_Name has to be the FIRST parameter given
+#
+PHYSICAL_CHANNEL_Name															PC1
+#--------------
+#
+PHYSICAL_CHANNEL_IP_Address												PC1 127.0.0.1
+PHYSICAL_CHANNEL_TX_Port_RX_Port                  PC1 55333 55333
+PHYSICAL_CHANNEL_OID_Frame_Content                PC1 UUUUUUUUUUUU
+#--------------
+PHYSICAL_CHANNEL_Transfer_Frame_Type 							PC1 Variable
+# PHYSICAL_CHANNEL_Transfer_Frame_Length, if fixed length, trumps all subordinate 'frame length' parameters
+PHYSICAL_CHANNEL_Transfer_Frame_Length		        PC1 25
+PHYSICAL_CHANNEL_Transfer_Frame_Version_Number		PC1 12
+PHYSICAL_CHANNEL_MC_Multiplexing_Scheme						PC1 1111
+PHYSICAL_CHANNEL_Presence_of_Isochronous_Insert_Zone PC1 Absent
+PHYSICAL_CHANNEL_Isochronous_Insert_Zone_Length 	PC1 13
+PHYSICAL_CHANNEL_Presence_of_Frame_Error_Control	PC1 Absent
+PHYSICAL_CHANNEL_Frame_Error_Control_Length 			PC1 4
+PHYSICAL_CHANNEL_Generate_OID_Frame               PC1 False
+PHYSICAL_CHANNEL_Maximum_Number_of_Transfer_Frames_Given_to_the_Coding_And_Sync_Sublayer_as_a_Single_Data_Unit	PC1 1
+PHYSICAL_CHANNEL_Maximum_Value_of_the_Repetitions_Parameter_to_the_Coding_And_Synchronization_Sublayer PC1 1
+#
+#
+#PHYSICAL_CHANNEL_Name has to be the FIRST parameter given
+# pc 2 fixed length to demonstrate insert zone. pc 2 mc 786474 vc 0 mapid 0 packet
+PHYSICAL_CHANNEL_Name															PC2
+#--------------
+#
+PHYSICAL_CHANNEL_IP_Address												PC2 127.0.0.1
+PHYSICAL_CHANNEL_TX_Port_RX_Port                  PC2 55222 55222
+PHYSICAL_CHANNEL_OID_Frame_Content                PC2 UUUUUUUUUUUU
+#--------------
+PHYSICAL_CHANNEL_Transfer_Frame_Type 							PC2 Fixed
+# PHYSICAL_CHANNEL_Transfer_Frame_Length, if fixed length, trumps all subordinate 'frame length' parameters
+PHYSICAL_CHANNEL_Transfer_Frame_Length		        PC2 73
+PHYSICAL_CHANNEL_Transfer_Frame_Version_Number		PC2 12
+PHYSICAL_CHANNEL_MC_Multiplexing_Scheme						PC2 1111
+PHYSICAL_CHANNEL_Presence_of_Isochronous_Insert_Zone PC2 Present
+PHYSICAL_CHANNEL_Isochronous_Insert_Zone_Length 	PC2 13
+PHYSICAL_CHANNEL_Presence_of_Frame_Error_Control	PC2 Present
+PHYSICAL_CHANNEL_Frame_Error_Control_Length 			PC2 4
+PHYSICAL_CHANNEL_Generate_OID_Frame               PC2 True
+PHYSICAL_CHANNEL_Maximum_Number_of_Transfer_Frames_Given_to_the_Coding_And_Sync_Sublayer_as_a_Single_Data_Unit	PC2 1
+PHYSICAL_CHANNEL_Maximum_Value_of_the_Repetitions_Parameter_to_the_Coding_And_Synchronization_Sublayer PC2 1
+#
+#
+#
+# master channel for master channel frame service (separate from mcids with vcids and mapid saps)
+# ONE MASTER CHANNEL CAN *NOT* PROCESS *BOTH* mcid frame service frames *AND* vcid/mapid demuxed frames
+#
+# tfvn 12 scid 1 = 0xc0033 vcid 1 mapid 0 delay-in-ms-between-releases-of-frames-from-the-same-vcid-timer 1000000
+# VC&MC FRAME SERVICE PARAMETERS - PChan MCID VCID MAPID seqCtrlFrameCounterLen expFrameCounterLen delay-in-ms-between-releases-of-frames-from-the-same-vcid-timer
+# mcid 786483 = tfvn 12, scid 51
+MASTER_CHANNEL_FRAME_SERVICE									PC1 786483 14 7 2 4 1000000 
+#
+# MC_ID 786474 // for transfer version number of 12 (times 65536) + spacecraft id of 0, or 0xc0000
+#MASTER_CHANNEL_MC_ID has to be the FIRST parameter given
+MASTER_CHANNEL_MC_ID 													PC1 786474
+MASTER_CHANNEL_Transfer_Frame_Type						PC1 786474 Variable
+MASTER_CHANNEL_Spacecraft_ID									PC1 786474 42
+#ALL vcids must be included - uslp vcids, frame service vcids, COP service vcids
+#vcid 63 is automatic and should not be listed in MASTER_CHANNEL_VCIDs parameter values
+MASTER_CHANNEL_VCIDs       										PC1 786474 0,7,62
+MASTER_CHANNEL_VC_Multiplexing_Scheme					PC1 786474 2222
+MASTER_CHANNEL_Number_of_Times_To_Release_OCF_After_Delivery PC1 786474 6
+#
+# MC_ID 786474 // for transfer version number of 12 (times 65536) + spacecraft id of 0, or 0xc0000
+#MASTER_CHANNEL_MC_ID has to be the FIRST parameter given
+MASTER_CHANNEL_MC_ID 													PC2 786474
+MASTER_CHANNEL_Transfer_Frame_Type						PC2 786474 Fixed
+MASTER_CHANNEL_Spacecraft_ID									PC2 786474 42
+#ALL vcids must be included - uslp vcids, frame service vcids, COP service vcids
+#vcid 63 is automatic and should not be listed in MASTER_CHANNEL_VCIDs parameter values
+MASTER_CHANNEL_VCIDs       										PC2 786474 0,7,62
+MASTER_CHANNEL_VC_Multiplexing_Scheme					PC2 786474 2222
+MASTER_CHANNEL_Number_of_Times_To_Release_OCF_After_Delivery PC2 786474 3
+#
+# virtual channel for virtual channel frame service (separate from vcids with mapid saps)
+#  physchan mcid vcid bogusMapid delay-in-ms-between-releases-of-frames-from-the-same-vcid-timer
+#
+# VC&MC FRAME SERVICE PARAMETERS - PChan MCID VCID MAPID seqCtrlFrameCounterLen expFrameCounterLen delay-in-ms-between-releases-of-frames-from-the-same-vcid-timer
+# tfvn 12 scid 43 vcid 51 mapid 3
+VIRTUAL_CHANNEL_FRAME_SERVICE									PC1 786474 51 3 2 4 1000000
+#
+#
+#vcid 0 for mapids 0 and 15
+#
+#
+# for physical channel PC1 mc_id 786474
+#VIRTUAL_CHANNEL_MAP_IDs			 has to be the FIRST parameter given and the maps must be consecutive, comma-delimited, with no spaces. like 2,4,6,8,15 not 2 4 or 2, 4, 6, 8
+VIRTUAL_CHANNEL_MAP_IDs																					PC1 786474 0 0,15
+VIRTUAL_CHANNEL_Transfer_Frame_Type 														PC1 786474 0 Fixed
+VIRTUAL_CHANNEL_VCID                                            PC1 786474 0 0
+VIRTUAL_CHANNEL_VC_Count_Length_for_Sequence_Control						PC1 786474 0 2
+VIRTUAL_CHANNEL_VC_Count_Length_for_Expedited_Integer           PC1 786474 0 2
+#cop in effect - "0"=none "1"=cop-1 using gvcid "2"=cop-P using port id
+VIRTUAL_CHANNEL_COP_in_Effect																		PC1 786474 0 2
+VIRTUAL_CHANNEL_CLCW_Version_Number															PC1 786474 0 1
+#this value is a real number with decimals. passed as a string.
+VIRTUAL_CHANNEL_CLCW_Reporting_Rate															PC1 786474 0 3.1415
+VIRTUAL_CHANNEL_MAP_Multiplexing_Scheme													PC1 786474 0 8888
+#VIRTUAL_CHANNEL_TFDF_Length why do i need this when the maps have it?
+VIRTUAL_CHANNEL_Truncated_Frame_Total_Length	                  PC1 786474 0 8
+VIRTUAL_CHANNEL_Inclusion_of_OCF_Allow_Variable_Length_Frames   PC1 786474 0 False
+VIRTUAL_CHANNEL_Inclusion_of_OCF_Required_Fixed_Length_Frames   PC1 786474 0 False
+VIRTUAL_CHANNEL_Value_for_the_Repetitions_parameter_to_the_Coding_And_Sync_Sublayer_when_transferring_frames_carrying_service_data_on_the_Sequence_Controlled_Service PC1 786474 0 1
+VIRTUAL_CHANNEL_Value_for_the_Repetitions_parameter_to_the_Coding_And_Sync_Sublayer_when_transferring_frames_carrying_COP_control_commands	PC1 786474 0 1
+VIRTUAL_CHANNEL_Maximum_Ms_Delay_to_Release_TFDF_Once_Started   PC1 786474 0 4
+# zero release time means there's no release timeout. nonzero means this many MS of nothing on vcid results in OID tx compliant with 4.1.4.1.6
+VIRTUAL_CHANNEL_Maximum_delay_in_milliseconds_between_releases_of_frames_of_the_same_VC PC1 786474 0 4
+VIRTUAL_CHANNEL_Presence_of_Space_Data_Link_Security_Header			PC1 786474 0 Absent
+VIRTUAL_CHANNEL_Length_of_Space_Data_Link_Security_Header 			PC1 786474 0 3
+VIRTUAL_CHANNEL_Presence_of_Space_Data_Link_Security_Trailer		PC1 786474 0 Absent
+VIRTUAL_CHANNEL_Length_of_Space_Data_Link_Security_Trailer 			PC1 786474 0 8
+#VIRTUAL_CHANNEL_MAP_IDs			 has to be the FIRST parameter given and the maps must be consecutive, comma-delimited, with no spaces. like 2,4,6,8,15 not 2 4 or 2, 4, 6, 8
+#VC 63 has reduced parameter set - vc count length, since it's sent as an expedited frame. gotta have this since a default isn't specified anywhere.
+VIRTUAL_CHANNEL_MAP_IDs																					PC1 786474 63 0
+VIRTUAL_CHANNEL_VC_Count_Length_for_Expedited_Integer           PC1 786474 63 2
+#
+#
+#vcid 0 for mapids 0 and 15 for physical channel 2 (fixed length for insert zone demo)
+#
+#
+# for physical channel PC1 mc_id 786474
+#VIRTUAL_CHANNEL_MAP_IDs			 has to be the FIRST parameter given and the maps must be consecutive, comma-delimited, with no spaces. like 2,4,6,8,15 not 2 4 or 2, 4, 6, 8
+VIRTUAL_CHANNEL_MAP_IDs																					PC2 786474 0 0
+VIRTUAL_CHANNEL_Transfer_Frame_Type 														PC2 786474 0 Fixed
+VIRTUAL_CHANNEL_VCID                                            PC2 786474 0 0
+VIRTUAL_CHANNEL_VC_Count_Length_for_Sequence_Control						PC2 786474 0 2
+VIRTUAL_CHANNEL_VC_Count_Length_for_Expedited_Integer           PC2 786474 0 2
+#cop in effect - "0"=none "1"=cop-1 using gvcid "2"=cop-P using port id
+VIRTUAL_CHANNEL_COP_in_Effect																		PC2 786474 0 2
+VIRTUAL_CHANNEL_CLCW_Version_Number															PC2 786474 0 1
+#this value is a real number with decimals. passed as a string.
+VIRTUAL_CHANNEL_CLCW_Reporting_Rate															PC2 786474 0 3.1415
+VIRTUAL_CHANNEL_MAP_Multiplexing_Scheme													PC2 786474 0 8888
+#VIRTUAL_CHANNEL_TFDF_Length why do i need this when the maps have it?
+VIRTUAL_CHANNEL_Truncated_Frame_Total_Length	                  PC2 786474 0 8
+VIRTUAL_CHANNEL_Inclusion_of_OCF_Allow_Variable_Length_Frames   PC2 786474 0 True
+VIRTUAL_CHANNEL_Inclusion_of_OCF_Required_Fixed_Length_Frames   PC2 786474 0 True
+VIRTUAL_CHANNEL_Value_for_the_Repetitions_parameter_to_the_Coding_And_Sync_Sublayer_when_transferring_frames_carrying_service_data_on_the_Sequence_Controlled_Service PC2 786474 0 1
+VIRTUAL_CHANNEL_Value_for_the_Repetitions_parameter_to_the_Coding_And_Sync_Sublayer_when_transferring_frames_carrying_COP_control_commands	PC2 786474 0 1
+VIRTUAL_CHANNEL_Maximum_Ms_Delay_to_Release_TFDF_Once_Started   PC2 786474 0 4
+# zero release time means there's no release timeout. nonzero means this many MS of nothing on vcid results in OID tx compliant with 4.1.4.1.6
+VIRTUAL_CHANNEL_Maximum_delay_in_milliseconds_between_releases_of_frames_of_the_same_VC PC2 786474 0 4
+VIRTUAL_CHANNEL_Presence_of_Space_Data_Link_Security_Header			PC2 786474 0 Present
+VIRTUAL_CHANNEL_Length_of_Space_Data_Link_Security_Header 			PC2 786474 0 6
+VIRTUAL_CHANNEL_Presence_of_Space_Data_Link_Security_Trailer		PC2 786474 0 Present
+VIRTUAL_CHANNEL_Length_of_Space_Data_Link_Security_Trailer 			PC2 786474 0 8
+#VIRTUAL_CHANNEL_MAP_IDs			 has to be the FIRST parameter given and the maps must be consecutive, comma-delimited, with no spaces. like 2,4,6,8,15 not 2 4 or 2, 4, 6, 8
+#VC 63 has reduced parameter set - vc count length, since it's sent as an expedited frame. gotta have this since a default isn't specified anywhere.
+VIRTUAL_CHANNEL_MAP_IDs																					PC2 786474 63 0
+VIRTUAL_CHANNEL_VC_Count_Length_for_Expedited_Integer           PC2 786474 63 2
+#
+#
+#vcid 7 for mapids 8
+#
+#
+# for physical channel PC1 mc_id 786474
+#VIRTUAL_CHANNEL_MAP_IDs			 has to be the FIRST parameter given and the maps must be consecutive, comma-delimited, with no spaces. like 2,4,6,8,15 not 2 4 or 2, 4, 6, 8
+VIRTUAL_CHANNEL_MAP_IDs																					PC1 786474 7 8
+VIRTUAL_CHANNEL_Transfer_Frame_Type 														PC1 786474 7 Variable
+VIRTUAL_CHANNEL_VCID                                            PC1 786474 7 0
+VIRTUAL_CHANNEL_VC_Count_Length_for_Sequence_Control						PC1 786474 7 2
+VIRTUAL_CHANNEL_VC_Count_Length_for_Expedited_Integer           PC1 786474 7 2
+#cop in effect - "0"=none "1"=cop-1 using gvcid "2"=cop-P using port id
+VIRTUAL_CHANNEL_COP_in_Effect																		PC1 786474 7 1
+VIRTUAL_CHANNEL_CLCW_Version_Number															PC1 786474 7 1
+#this value is a real number with decimals. passed as a string.
+VIRTUAL_CHANNEL_CLCW_Reporting_Rate															PC1 786474 7 3.1415
+VIRTUAL_CHANNEL_MAP_Multiplexing_Scheme													PC1 786474 7 8888
+#VIRTUAL_CHANNEL_TFDF_Length why do i need this when the maps have it?
+VIRTUAL_CHANNEL_Truncated_Frame_Total_Length	                  PC1 786474 7 13
+VIRTUAL_CHANNEL_Inclusion_of_OCF_Allow_Variable_Length_Frames   PC1 786474 7 True
+VIRTUAL_CHANNEL_Inclusion_of_OCF_Required_Fixed_Length_Frames   PC1 786474 7 True
+VIRTUAL_CHANNEL_Value_for_the_Repetitions_parameter_to_the_Coding_And_Sync_Sublayer_when_transferring_frames_carrying_service_data_on_the_Sequence_Controlled_Service PC1 786474 7 1
+VIRTUAL_CHANNEL_Value_for_the_Repetitions_parameter_to_the_Coding_And_Sync_Sublayer_when_transferring_frames_carrying_COP_control_commands	PC1 786474 7 1
+VIRTUAL_CHANNEL_Maximum_Ms_Delay_to_Release_TFDF_Once_Started   PC1 786474 7 30
+# zero release time means there's no release timeout. nonzero means this many MS of nothing on vcid results in OID tx compliant with 4.1.4.1.6
+VIRTUAL_CHANNEL_Maximum_delay_in_milliseconds_between_releases_of_frames_of_the_same_VC PC1 786474 7 30
+VIRTUAL_CHANNEL_Presence_of_Space_Data_Link_Security_Header			PC1 786474 7 Absent
+VIRTUAL_CHANNEL_Length_of_Space_Data_Link_Security_Header 			PC1 786474 7 3
+VIRTUAL_CHANNEL_Presence_of_Space_Data_Link_Security_Trailer		PC1 786474 7 Absent
+VIRTUAL_CHANNEL_Length_of_Space_Data_Link_Security_Trailer 			PC1 786474 7 8
+#
+#
+#vcid 62 for mapids 1 and 14
+#
+#
+# for physical channel PC1 mc_id 786474
+#VIRTUAL_CHANNEL_MAP_IDs			 has to be the FIRST parameter given and the maps must be consecutive, comma-delimited, with no spaces. like 2,4,6,8,15 not 2 4 or 2, 4, 6, 8
+VIRTUAL_CHANNEL_MAP_IDs																					PC1 786474 62 1,14
+VIRTUAL_CHANNEL_Transfer_Frame_Type 														PC1 786474 62 Variable
+VIRTUAL_CHANNEL_VCID                                            PC1 786474 62 0
+VIRTUAL_CHANNEL_VC_Count_Length_for_Sequence_Control						PC1 786474 62 2
+VIRTUAL_CHANNEL_VC_Count_Length_for_Expedited_Integer           PC1 786474 62 2
+#cop in effect - "0"=none "1"=cop-1 using gvcid "2"=cop-P using port id
+VIRTUAL_CHANNEL_COP_in_Effect																		PC1 786474 62 1
+VIRTUAL_CHANNEL_CLCW_Version_Number															PC1 786474 62 1
+#this value is a real number with decimals. passed as a string.
+VIRTUAL_CHANNEL_CLCW_Reporting_Rate															PC1 786474 62 3.1415
+VIRTUAL_CHANNEL_MAP_Multiplexing_Scheme													PC1 786474 62 8888
+#VIRTUAL_CHANNEL_TFDF_Length why do i need this when the maps have it?
+VIRTUAL_CHANNEL_Truncated_Frame_Total_Length	                  PC1 786474 62 9
+VIRTUAL_CHANNEL_Inclusion_of_OCF_Allow_Variable_Length_Frames   PC1 786474 62 False
+VIRTUAL_CHANNEL_Inclusion_of_OCF_Required_Fixed_Length_Frames   PC1 786474 62 False
+VIRTUAL_CHANNEL_Value_for_the_Repetitions_parameter_to_the_Coding_And_Sync_Sublayer_when_transferring_frames_carrying_service_data_on_the_Sequence_Controlled_Service PC1 786474 62 1
+VIRTUAL_CHANNEL_Value_for_the_Repetitions_parameter_to_the_Coding_And_Sync_Sublayer_when_transferring_frames_carrying_COP_control_commands	PC1 786474 62 1
+VIRTUAL_CHANNEL_Maximum_Ms_Delay_to_Release_TFDF_Once_Started   PC1 786474 62 30
+# zero release time means there's no release timeout. nonzero means this many MS of nothing on vcid results in OID tx compliant with 4.1.4.1.6
+VIRTUAL_CHANNEL_Maximum_delay_in_milliseconds_between_releases_of_frames_of_the_same_VC PC1 786474 62 30
+VIRTUAL_CHANNEL_Presence_of_Space_Data_Link_Security_Header			PC1 786474 62 Absent
+VIRTUAL_CHANNEL_Length_of_Space_Data_Link_Security_Header 			PC1 786474 62 3
+VIRTUAL_CHANNEL_Presence_of_Space_Data_Link_Security_Trailer		PC1 786474 62 Absent
+VIRTUAL_CHANNEL_Length_of_Space_Data_Link_Security_Trailer 			PC1 786474 62 8
+#VIRTUAL_CHANNEL_MAP_IDs			 has to be the FIRST parameter given and the maps must be consecutive, comma-delimited, with no spaces. like 2,4,6,8,15 not 2 4 or 2, 4, 6, 8
+#VC 63 has reduced parameter set - vc count length, since it's sent as an expedited frame
+VIRTUAL_CHANNEL_MAP_IDs																					PC1 786474 63 0
+VIRTUAL_CHANNEL_VC_Count_Length_for_Expedited_Integer           PC1 786474 63 2
+#
+MAP_CHANNEL_VCID                              PC1 786474 0 0 0
+MAP_CHANNEL_MAP_ID                            PC1 786474 0 0 0
+#MAP_CHANNEL_OctetStream_DeliveryLength *MUST* precede MAP_CHANNEL_Service_Data_Unit_Type if type is octet_stream
+MAP_CHANNEL_OctetStream_DeliverLength				  PC1 786474 0 0 4
+#MAP_CHANNEL_OctetStream_RequestLength *MUST* precede MAP_CHANNEL_Service_Data_Unit_Type if type is octet_stream
+MAP_CHANNEL_OctetStream_RequestLength				  PC1 786474 0 0 4
+# packet data has its own inherent length varying per packet so it doesn't need a managed parameter to specify its length on either request or indication
+# MAP_CHANNEL_Service_Data_Unit_Type is either "packet","mapa_sdu", or "octet_stream"
+MAP_CHANNEL_Service_Data_Unit_Type						PC1 786474 0 0 packet
+# protid 0=spacePackets or Encapsulation packets;1=cop-1;2=cop-P; 4 = octet_stream; 5 = mapaSdu; 7= OID
+MAP_CHANNEL_USLP_Protocol_ID_Supported				PC1 786474 0 0 0
+#
+MAP_CHANNEL_VCID                              PC2 786474 0 0 0
+MAP_CHANNEL_MAP_ID                            PC2 786474 0 0 0
+#MAP_CHANNEL_OctetStream_DeliveryLength *MUST* precede MAP_CHANNEL_Service_Data_Unit_Type if type is octet_stream
+MAP_CHANNEL_OctetStream_DeliverLength				  PC2 786474 0 0 4
+#MAP_CHANNEL_OctetStream_RequestLength *MUST* precede MAP_CHANNEL_Service_Data_Unit_Type if type is octet_stream
+MAP_CHANNEL_OctetStream_RequestLength				  PC2 786474 0 0 4
+# packet data has its own inherent length varying per packet so it doesn't need a managed parameter to specify its length on either request or indication
+# MAP_CHANNEL_Service_Data_Unit_Type is either "packet","mapa_sdu", or "octet_stream"
+MAP_CHANNEL_Service_Data_Unit_Type						PC2 786474 0 0 packet
+# protid 0=spacePackets or Encapsulation packets;1=cop-1;2=cop-P; 4 = octet_stream; 5 = mapaSdu; 7= OID
+MAP_CHANNEL_USLP_Protocol_ID_Supported				PC2 786474 0 0 0
+#
+MAP_CHANNEL_VCID                              PC1 786474 0 15 0
+MAP_CHANNEL_MAP_ID                            PC1 786474 0 15 15
+#MAP_CHANNEL_OctetStream_DeliveryLength *MUST* precede MAP_CHANNEL_Service_Data_Unit_Type if type is octet_stream
+MAP_CHANNEL_OctetStream_DeliverLength				  PC1 786474 0 15 4
+#MAP_CHANNEL_OctetStream_RequestLength *MUST* precede MAP_CHANNEL_Service_Data_Unit_Type if type is octet_stream
+MAP_CHANNEL_OctetStream_RequestLength				  PC1 786474 0 15 4
+# packet data has its own inherent length varying per packet so it doesn't need a managed parameter to specify its length on either request or indication
+# MAP_CHANNEL_Service_Data_Unit_Type is either "packet","mapa_sdu", or "octet_stream"
+MAP_CHANNEL_Service_Data_Unit_Type						PC1 786474 0 15 mapa_sdu
+# protid 0=spacePackets or Encapsulation packets;1=cop-1;2=cop-P; 4 = octet_stream; 5 = mapaSdu; 7= OID
+MAP_CHANNEL_USLP_Protocol_ID_Supported				PC1 786474 0 15 5
+#  
+MAP_CHANNEL_VCID                              PC1 786474 7 8 7
+MAP_CHANNEL_MAP_ID                            PC1 786474 7 8 8
+#MAP_CHANNEL_OctetStream_DeliveryLength *MUST* precede MAP_CHANNEL_Service_Data_Unit_Type if type is octet_stream
+MAP_CHANNEL_OctetStream_DeliverLength				  PC1 786474 7 8 9
+#MAP_CHANNEL_OctetStream_RequestLength *MUST* precede MAP_CHANNEL_Service_Data_Unit_Type if type is octet_stream
+MAP_CHANNEL_OctetStream_RequestLength				  PC1 786474 7 8 9
+# packet data has its own inherent length varying per packet so it doesn't need a managed parameter to specify its length on either request or indication
+# MAP_CHANNEL_Service_Data_Unit_Type is either "packet","mapa_sdu", or "octet_stream"
+MAP_CHANNEL_Service_Data_Unit_Type						PC1 786474 7 8 octet_stream
+# protid 0=spacePackets or Encapsulation packets;1=cop-1;2=cop-P; 4 = octet_stream; 5 = mapaSdu; 7= OID
+MAP_CHANNEL_USLP_Protocol_ID_Supported				PC1 786474 7 8 4
+#
+#  
+MAP_CHANNEL_VCID                              PC1 786474 62 1 62
+MAP_CHANNEL_MAP_ID                            PC1 786474 62 1 1
+#MAP_CHANNEL_OctetStream_DeliveryLength *MUST* precede MAP_CHANNEL_Service_Data_Unit_Type if type is octet_stream
+MAP_CHANNEL_OctetStream_DeliverLength				  PC1 786474 62 1 4
+#MAP_CHANNEL_OctetStream_RequestLength *MUST* precede MAP_CHANNEL_Service_Data_Unit_Type if type is octet_stream
+MAP_CHANNEL_OctetStream_RequestLength				  PC1 786474 62 1 4
+# packet data has its own inherent length varying per packet so it doesn't need a managed parameter to specify its length on either request or indication
+# MAP_CHANNEL_Service_Data_Unit_Type is either "packet","mapa_sdu", or "octet_stream"
+MAP_CHANNEL_Service_Data_Unit_Type						PC1 786474 62 1 packet
+# protid 0=spacePackets or Encapsulation packets;1=cop-1;2=cop-P; 4 = octet_stream; 5 = mapaSdu; 7= OID
+MAP_CHANNEL_USLP_Protocol_ID_Supported				PC1 786474 62 1 0
+#
+#
+MAP_CHANNEL_VCID                              PC1 786474 62 14 62
+MAP_CHANNEL_MAP_ID                            PC1 786474 62 14 14
+#MAP_CHANNEL_OctetStream_DeliveryLength *MUST* precede MAP_CHANNEL_Service_Data_Unit_Type if type is octet_stream
+MAP_CHANNEL_OctetStream_DeliverLength				  PC1 786474 62 14 4
+#MAP_CHANNEL_OctetStream_RequestLength *MUST* precede MAP_CHANNEL_Service_Data_Unit_Type if type is octet_stream
+MAP_CHANNEL_OctetStream_RequestLength				  PC1 786474 62 14 4
+# packet data has its own inherent length varying per packet so it doesn't need a managed parameter to specify its length on either request or indication
+# MAP_CHANNEL_Service_Data_Unit_Type is either "packet","mapa_sdu", or "octet_stream"
+MAP_CHANNEL_Service_Data_Unit_Type						PC1 786474 62 14 mapa_sdu
+# protid 0=spacePackets or Encapsulation packets;1=cop-1;2=cop-P; 4 = octet_stream; 5 = mapaSdu; 7= OID
+MAP_CHANNEL_USLP_Protocol_ID_Supported				PC1 786474 62 14 5

@@ -1,0 +1,96 @@
+This USLP implementation was dynamically developed to adhere to a changing specification.
+It was designed neither for speed nor to immediately be dropped into real-world applications, 
+but rather as a proof of concept to validate its design document. As such, diagnostics key 
+to its efficient development and easy test verification have been left in. 
+
+This code only implements the USLP protocol mechanism - there is no supporting periphery 
+to do communication with other layers or to do data import/export retransmission/validation.
+For now stdin/stdout is the source/target.
+
+This simple demo gives a sample transmission/reception of the data types (packet, mapa_SDU, 
+octet stream, truncated frame, MC frame service, VC frame service, OID), frame types (fixed 
+and variable length as appropriate), and optional fields (insert zone, security header,
+security trailer, OCF, FECF). 
+
+Maximum USLP length frames are not included in this demo.
+
+Heterogrammatic data was used in development to offer humanly readable verification
+of segmented data field reassembly and minimize the chance of accidental apparent success.
+
+Copy USLP2023engineering.tar.gz to an empty directory, then run 
+
+  tar -zxvf USLP2023engineering.tar.gz 
+
+to extract the following files:
+
+  ReadMe - this file
+  mib.cc - the USLP protocol engineering implementation;
+  mibconfig - the USLP config file for this demo;
+  mtx.cc - simple UDP transmitter that does the requests for all the data types;
+  mrx.cc - simple UDP receiver that accepts USLP frames and does reassembly by data type;
+  kcpq.cc - utility module
+  kcpq.h - utility module
+  kcq.cc - utility module
+  kcq.h - utility module
+  kpmutex.cc - utility module
+  kpmutex.h - utility module
+  kpthread.cc - utility module
+  kpthread.h - utility module
+  kudprxtxclass.cc - utility module
+  mz - script for compilation
+  kz - script to see all extracted reassembled deliverable data fields in receiver target file kr 
+
+
+Run
+
+  mz
+  
+to compile, then run
+
+  ur > kr 
+
+then in another terminal window in the same directory run 
+
+  ut > kt 
+  
+until ut finishes ( about 60 seconds ). When ut finishes, hit Cntrl-C in the ur terminal window
+to stop it.
+
+kr and kt will now contain the diagnostics of the progress of transmission of the sample data 
+types.
+
+To see only the diagnostics regarding actual data transmission, reception, and idle frames, for
+purposes of verifying datafield segmentation, reassembly veracity, and queue flushing, run
+
+  grep txoat kt
+
+in the ut window or 
+
+  grep "got a frame" kr
+
+in the ur window. To see all the completed reassembled deliverable fields received run
+
+  kz
+
+in the ur window. Verify those with the request types in mtx.cc and the settings in mibconfig.
+
+To see only specific types of field data, run
+
+  grep $1 kr
+
+where $1 is:
+
+  PKT for packet data fields, 
+  SDU for mapa_SDU data fields,
+  OCT for octet_stream data fields,
+  TRU for truncated frames,
+  MCid for MC Frame Service frames,
+  VCid for VC Frame Service frames,
+  IZN for insert zone data,
+  OCF for ocf data,
+  HDR for security header data,
+  TRL for security trailer data, and
+  FEC for fecf data.
+
+Known bugs: 
+  Timers ultimately destined to be in millisecond resolution are currently in second resolution.

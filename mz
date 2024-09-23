@@ -1,0 +1,4 @@
+rm -f ut
+rm -f ur
+g++ mtx.cc -lpthread -o ut
+g++ mrx.cc -lpthread -o ur
